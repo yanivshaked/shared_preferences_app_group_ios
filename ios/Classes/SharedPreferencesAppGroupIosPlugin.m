@@ -1,6 +1,21 @@
 #import "SharedPreferencesAppGroupIosPlugin.h"
 
 @implementation SharedPreferencesAppGroupIosPlugin
+
++ (NSMutableDictionary*)getAllPrefs:(NSString*)appGroupName {
+  NSUserDefaults *defaults = [[NSUserDefaults alloc] initWithSuiteName:appGroupName];
+  NSDictionary *prefs = [defaults dictionaryRepresentation];
+  NSMutableDictionary *filteredPrefs = [NSMutableDictionary dictionary];
+  if (prefs != nil) {
+    for (NSString *candidateKey in prefs) {
+      if ([candidateKey hasPrefix:@"flutter."]) {
+        [filteredPrefs setObject:prefs[candidateKey] forKey:candidateKey];
+      }
+    }
+  }
+  return filteredPrefs;
+}
+
 + (void)registerWithRegistrar:(NSObject<FlutterPluginRegistrar>*)registrar {
   FlutterMethodChannel* channel = [FlutterMethodChannel
       methodChannelWithName:@"shared_preferences_app_group_ios"
@@ -16,7 +31,8 @@
   NSString *appGroupName = arguments[@"appGroupName"];
 
   if ([method isEqualToString:@"getAll"]) {
-    result(getAllPrefs(appGroupName));
+    NSMutableDictionary *dictionary = [SharedPreferencesAppGroupIosPlugin getAllPrefs:appGroupName];
+    result(dictionary);
   } else if ([method isEqualToString:@"setBool"]) {
     NSString *key = arguments[@"key"];
     NSNumber *value = arguments[@"value"];
@@ -60,29 +76,14 @@
     result(@YES);
   } else if ([method isEqualToString:@"clear"]) {
     NSUserDefaults *defaults = [[NSUserDefaults alloc] initWithSuiteName:appGroupName];
-    for (NSString *key in getAllPrefs()) {
+    NSMutableDictionary *dictionary = [SharedPreferencesAppGroupIosPlugin getAllPrefs:appGroupName];
+    for (NSString *key in dictionary) {
       [defaults removeObjectForKey:key];
     }
     result(@YES);
   } else {
     result(FlutterMethodNotImplemented);
   }
-}
-
-#pragma mark - Private
-
-static NSMutableDictionary *getAllPrefs:(NSString *)appGroupName {
-  NSUserDefaults *defaults = [[NSUserDefaults alloc] initWithSuiteName:appGroupName];
-  NSDictionary *prefs = [defaults dictionaryRepresentation];
-  NSMutableDictionary *filteredPrefs = [NSMutableDictionary dictionary];
-  if (prefs != nil) {
-    for (NSString *candidateKey in prefs) {
-      if ([candidateKey hasPrefix:@"flutter."]) {
-        [filteredPrefs setObject:prefs[candidateKey] forKey:candidateKey];
-      }
-    }
-  }
-  return filteredPrefs;
 }
 
 @end
