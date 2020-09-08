@@ -1,6 +1,6 @@
 name: shared_preferences_app_group_ios
 description: Support for iOS NSUserDefaults shared between iOS AppGroups.
-version: 0.0.1
+version: 0.0.2
 homepage: https://github.com/yanivshaked/shared_preferences_app_group_ios
 
 environment:
