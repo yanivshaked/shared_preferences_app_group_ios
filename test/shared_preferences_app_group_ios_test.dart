@@ -13,6 +13,7 @@ void main() async {
     'flutter.int': 42,
     'flutter.double': 3.14159,
     'flutter.List': <String>['foo', 'bar'],
+    'flutter.Map': {'d1key1': 'd1value1', 'd1key2': 'd1value2'}
   };
 
   const Map<String, dynamic> testValuesGroup2 = <String, dynamic>{
@@ -21,6 +22,7 @@ void main() async {
     'flutter.int': 24,
     'flutter.double': 2.7182818,
     'flutter.List': <String>['moshe', 'zuchmir'],
+    'flutter.Map': {'d2key1': 'd2value1', 'd2key2': 'd2value2'}
   };
 
   List<Map<String, dynamic>> testValuesPerGroup = {
@@ -68,6 +70,10 @@ void main() async {
           expect(methodCall.arguments["key"], "flutter.List");
           expect(methodCall.arguments["value"], testValuesPerGroup[groupIndex]['flutter.List']);
           return true;
+        case "setMap":
+          expect(methodCall.arguments["key"], "flutter.Map");
+          expect(methodCall.arguments["value"], testValuesPerGroup[groupIndex]['flutter.Map']);
+          return true;
         default:
           assert(false, "Unexpected method, please add support for ${methodCall.method}");
       }
@@ -99,6 +105,8 @@ void main() async {
     await sharedPrefsAppGroup2.setDouble('double', testValuesGroup2['flutter.double']);
     await sharedPrefsAppGroup1.setStringList('List', testValuesGroup1['flutter.List']);
     await sharedPrefsAppGroup2.setStringList('List', testValuesGroup2['flutter.List']);
+    await sharedPrefsAppGroup1.setMap('Map', testValuesGroup1['flutter.Map']);
+    await sharedPrefsAppGroup2.setMap('Map', testValuesGroup2['flutter.Map']);
   });
 
   /* Verify the cache */
@@ -113,6 +121,8 @@ void main() async {
     expect(sharedPrefsAppGroup2.getDouble('double'), testValuesGroup2['flutter.double']);
     expect(sharedPrefsAppGroup1.getStringList('List'), testValuesGroup1['flutter.List']);
     expect(sharedPrefsAppGroup2.getStringList('List'), testValuesGroup2['flutter.List']);
+    expect(sharedPrefsAppGroup1.getMap('Map'), testValuesGroup1['flutter.Map']);
+    expect(sharedPrefsAppGroup2.getMap('Map'), testValuesGroup2['flutter.Map']);
   });
 
   /* Discard cache and reload from device */
@@ -131,6 +141,8 @@ void main() async {
     expect(sharedPrefsAppGroup2.getDouble('double'), testValuesGroup2['flutter.double']);
     expect(sharedPrefsAppGroup1.getStringList('List'), testValuesGroup1['flutter.List']);
     expect(sharedPrefsAppGroup2.getStringList('List'), testValuesGroup2['flutter.List']);
+    expect(sharedPrefsAppGroup1.getMap('Map'), testValuesGroup1['flutter.Map']);
+    expect(sharedPrefsAppGroup2.getMap('Map'), testValuesGroup2['flutter.Map']);
   });
 
   test('load new prefs', () async {
@@ -148,6 +160,8 @@ void main() async {
     expect(sharedPrefsAppGroup2.getDouble('double'), testValuesGroup2['flutter.double']);
     expect(sharedPrefsAppGroup1.getStringList('List'), testValuesGroup1['flutter.List']);
     expect(sharedPrefsAppGroup2.getStringList('List'), testValuesGroup2['flutter.List']);
+    expect(sharedPrefsAppGroup1.getMap('Map'), testValuesGroup1['flutter.Map']);
+    expect(sharedPrefsAppGroup2.getMap('Map'), testValuesGroup2['flutter.Map']);
   });
 
   /* TODO: Test the remove */

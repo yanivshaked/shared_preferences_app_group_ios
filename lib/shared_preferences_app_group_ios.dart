@@ -22,7 +22,6 @@ class SharedPreferencesAppGroupIos {
 
   String _appGroupName;
 
-
   /// Returns all keys in the persistent storage.
   Set<String> getKeys() => Set<String>.from(_preferenceCache.keys);
 
@@ -59,7 +58,15 @@ class SharedPreferencesAppGroupIos {
     // Make a copy of the list so that later mutations won't propagate
     return list?.toList();
   }
-  
+
+  /// Reads a map of string to string values from persistent storage, throwing an
+  /// exception if it's not a string set.
+  Map<dynamic, dynamic> getMap(String key) {
+    Map<dynamic, dynamic> map = _preferenceCache[key];
+    // Make a copy of the list so that later mutations won't propagate
+    return map != null ? new Map<dynamic, dynamic>.from(map) : null;
+  }
+
   /// Saves a boolean [value] to persistent storage in the background.
   ///
   /// If [value] is null, this is equivalent to calling [remove()] on the [key].
@@ -86,6 +93,11 @@ class SharedPreferencesAppGroupIos {
   ///
   /// If [value] is null, this is equivalent to calling [remove()] on the [key].
   Future<bool> setStringList(String key, List<String> value) => _setValue('StringList', key, value);
+
+  /// Saves a map [value] to persistent storage in the background.
+  ///
+  /// If [value] is null, this is equivalent to calling [remove()] on the [key].
+  Future<bool> setMap(String key, Map<dynamic, dynamic> value) => _setValue('Map', key, value);
 
   /// Removes an entry from persistent storage.
   Future<bool> remove(String key) => _setValue(null, key, null);

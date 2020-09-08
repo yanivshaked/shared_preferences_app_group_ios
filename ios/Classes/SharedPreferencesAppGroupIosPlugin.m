@@ -66,6 +66,12 @@
     NSUserDefaults *sharedDefaults = [[NSUserDefaults alloc] initWithSuiteName:appGroupName];
     [sharedDefaults setValue:value forKey:key];
     result(@YES);
+  } else if ([method isEqualToString:@"setMap"]) {
+    NSString *key = arguments[@"key"];
+    NSArray *value = arguments[@"value"];
+    NSUserDefaults *sharedDefaults = [[NSUserDefaults alloc] initWithSuiteName:appGroupName];
+    [sharedDefaults setObject:value forKey:key];
+    result(@YES);
   } else if ([method isEqualToString:@"commit"]) {
     // synchronize is deprecated.
     // "this method is unnecessary and shouldn't be used."
