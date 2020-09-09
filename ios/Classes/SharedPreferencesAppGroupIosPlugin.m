@@ -68,7 +68,7 @@
     result(@YES);
   } else if ([method isEqualToString:@"setMap"]) {
     NSString *key = arguments[@"key"];
-    NSArray *value = arguments[@"value"];
+    NSDictionary<NSString *, NSString *> *value = arguments[@"value"];
     NSUserDefaults *sharedDefaults = [[NSUserDefaults alloc] initWithSuiteName:appGroupName];
     [sharedDefaults setObject:value forKey:key];
     result(@YES);
