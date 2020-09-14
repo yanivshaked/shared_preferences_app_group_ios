@@ -1,3 +1,7 @@
+## 0.0.3
+
+* Support for Android platform (over Shared preferences), including map.
+
 ## 0.0.2
 
 * Support for map (NSDictionary).
