@@ -27,7 +27,7 @@ flutter:
   plugin:
     platforms:
       android:
-        package: com.example.shared_preferences_app_group_ios
+        package: com.twtech.shared_preferences_app_group_ios
         pluginClass: SharedPreferencesAppGroupIosPlugin
       ios:
         pluginClass: SharedPreferencesAppGroupIosPlugin
