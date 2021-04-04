@@ -35,7 +35,7 @@ void main() async {
       // By method call:
       // Set: Verify saved data
       // Get: Verify group name and return correct data
-      int groupIndex;
+      late int groupIndex;
       switch (methodCall.arguments["appGroupName"]) {
         case "group1.com.group.name":
           groupIndex = 0;
@@ -88,8 +88,8 @@ void main() async {
   var appGroupName1 = "group1.com.group.name";
   var appGroupName2 = "group2.com.group.name";
 
-  SharedPreferencesAppGroupIos sharedPrefsAppGroup1;
-  SharedPreferencesAppGroupIos sharedPrefsAppGroup2;
+  late SharedPreferencesAppGroupIos sharedPrefsAppGroup1;
+  late SharedPreferencesAppGroupIos sharedPrefsAppGroup2;
 
   test('writing', () async {
     sharedPrefsAppGroup1 = await SharedPreferencesAppGroupIos.getInstance(appGroupName1);

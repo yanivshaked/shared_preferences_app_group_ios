@@ -6,9 +6,11 @@ class SharedPreferencesAppGroupIos {
   static const MethodChannel _channel = const MethodChannel('shared_preferences_app_group_ios');
 
   static const String _prefix = 'flutter.';
-  static Map<String, Completer<SharedPreferencesAppGroupIos>> _completersMap;
+  static late Map<String, Completer<SharedPreferencesAppGroupIos>> _completersMap;
 
-  SharedPreferencesAppGroupIos._(this._preferenceCache, this._appGroupName);
+  SharedPreferencesAppGroupIos._(this._preferenceCache, this._appGroupName){
+      _completersMap = new Map<String, Completer<SharedPreferencesAppGroupIos>>();
+  }
 
   /// The cache that holds all preferences.
   ///
@@ -18,7 +20,7 @@ class SharedPreferencesAppGroupIos {
   ///
   /// It is NOT guaranteed that this cache and the device prefs will remain
   /// in sync since the setter method might fail for any reason.
-  final Map<String, Object> _preferenceCache;
+  final Map<String, Object?> _preferenceCache;
 
   String _appGroupName;
 
@@ -30,39 +32,39 @@ class SharedPreferencesAppGroupIos {
 
   /// Reads a value from persistent storage, throwing an exception if it's not a
   /// bool.
-  bool getBool(String key) => _preferenceCache[key];
+  bool? getBool(String key) => _preferenceCache[key] as bool?;
 
   /// Reads a value from persistent storage, throwing an exception if it's not
   /// an int.
-  int getInt(String key) => _preferenceCache[key];
+  int? getInt(String key) => _preferenceCache[key] as int?;
 
   /// Reads a value from persistent storage, throwing an exception if it's not a
   /// double.
-  double getDouble(String key) => _preferenceCache[key];
+  double? getDouble(String key) => _preferenceCache[key] as double?;
 
   /// Reads a value from persistent storage, throwing an exception if it's not a
   /// String.
-  String getString(String key) => _preferenceCache[key];
+  String? getString(String key) => _preferenceCache[key] as String?;
 
   /// Returns true if persistent storage the contains the given [key].
   bool containsKey(String key) => _preferenceCache.containsKey(key);
 
   /// Reads a set of string values from persistent storage, throwing an
   /// exception if it's not a string set.
-  List<String> getStringList(String key) {
-    List<Object> list = _preferenceCache[key];
+  List<String>? getStringList(String key) {
+    List<Object>? list = _preferenceCache[key] as List<Object>?;
     if (list != null && list is! List<String>) {
       list = list.cast<String>().toList();
       _preferenceCache[key] = list;
     }
     // Make a copy of the list so that later mutations won't propagate
-    return list?.toList();
+    return list?.toList() as List<String>?;
   }
 
   /// Reads a map of string to string values from persistent storage, throwing an
   /// exception if it's not a string set.
-  Map<String, String> getMap(String key) {
-    Map<dynamic, dynamic> map = _preferenceCache[key];
+  Map<String, String>? getMap(String key) {
+    Map<dynamic, dynamic>? map = _preferenceCache[key] as Map<dynamic, dynamic>?;
     // Make a copy of the list so that later mutations won't propagate
     return map != null ? new Map<String, String>.from(map) : null;
   }
@@ -70,40 +72,40 @@ class SharedPreferencesAppGroupIos {
   /// Saves a boolean [value] to persistent storage in the background.
   ///
   /// If [value] is null, this is equivalent to calling [remove()] on the [key].
-  Future<bool> setBool(String key, bool value) => _setValue('Bool', key, value);
+  Future<bool> setBool(String key, bool? value) => _setValue('Bool', key, value);
 
   /// Saves an integer [value] to persistent storage in the background.
   ///
   /// If [value] is null, this is equivalent to calling [remove()] on the [key].
-  Future<bool> setInt(String key, int value) => _setValue('Int', key, value);
+  Future<bool> setInt(String key, int? value) => _setValue('Int', key, value);
 
   /// Saves a double [value] to persistent storage in the background.
   ///
   /// Android doesn't support storing doubles, so it will be stored as a float.
   ///
   /// If [value] is null, this is equivalent to calling [remove()] on the [key].
-  Future<bool> setDouble(String key, double value) => _setValue('Double', key, value);
+  Future<bool> setDouble(String key, double? value) => _setValue('Double', key, value);
 
   /// Saves a string [value] to persistent storage in the background.
   ///
   /// If [value] is null, this is equivalent to calling [remove()] on the [key].
-  Future<bool> setString(String key, String value) => _setValue('String', key, value);
+  Future<bool> setString(String key, String? value) => _setValue('String', key, value);
 
   /// Saves a list of strings [value] to persistent storage in the background.
   ///
   /// If [value] is null, this is equivalent to calling [remove()] on the [key].
-  Future<bool> setStringList(String key, List<String> value) => _setValue('StringList', key, value);
+  Future<bool> setStringList(String key, List<String>? value) => _setValue('StringList', key, value);
 
   /// Saves a map [value] to persistent storage in the background.
   ///
   /// If [value] is null, this is equivalent to calling [remove()] on the [key].
-  Future<bool> setMap(String key, Map<String, String> value) => _setValue('Map', key, value);
+  Future<bool> setMap(String key, Map<String, String>? value) => _setValue('Map', key, value);
 
   /// Removes an entry from persistent storage.
   Future<bool> remove(String key) => _setValue(null, key, null);
 
   /// Completes with true once the user preferences for the app has been cleared.
-  Future<bool> clear() {
+  Future<bool?> clear() {
     _preferenceCache.clear();
     return _storeClear();
   }
@@ -113,7 +115,7 @@ class SharedPreferencesAppGroupIos {
   /// Use this method to observe modifications that were made in native code
   /// (without using the plugin) while the app is running.
   Future<void> reload() async {
-    final Map<String, Object> preferences = await SharedPreferencesAppGroupIos._getSharedPreferencesMap(_appGroupName);
+    final Map<String, Object?> preferences = await SharedPreferencesAppGroupIos._getSharedPreferencesMap(_appGroupName);
     _preferenceCache.clear();
     _preferenceCache.addAll(preferences);
   }
@@ -123,20 +125,16 @@ class SharedPreferencesAppGroupIos {
   /// Because this is reading from disk, it shouldn't be awaited in
   /// performance-sensitive blocks.
   static Future<SharedPreferencesAppGroupIos> getInstance(String appGroupName) async {
-    if (_completersMap == null) {
-      _completersMap = new Map<String, Completer<SharedPreferencesAppGroupIos>>();
-    }
-
     /* If already exists, use it */
     if (_completersMap.containsKey(appGroupName)) {
-      return _completersMap[appGroupName].future;
+      return _completersMap[appGroupName]!.future;
     }
 
     /* Does not exist, create one */
     var completer = Completer<SharedPreferencesAppGroupIos>();
     _completersMap[appGroupName] = completer;
     try {
-      final Map<String, Object> preferencesMap = await _getSharedPreferencesMap(appGroupName);
+      final Map<String, Object?> preferencesMap = await _getSharedPreferencesMap(appGroupName);
       completer.complete(SharedPreferencesAppGroupIos._(preferencesMap, appGroupName));
     } on Exception catch (e) {
       // If there's an error, explicitly return the future with an error.
@@ -149,11 +147,11 @@ class SharedPreferencesAppGroupIos {
     return completer.future;
   }
 
-  static Future<Map<String, Object>> _getSharedPreferencesMap(String appGroupName) async {
-    final Map<String, Object> fromSystem = await _storeGetAll(appGroupName);
+  static Future<Map<String, Object?>> _getSharedPreferencesMap(String appGroupName) async {
+    final Map<String, Object> fromSystem = await (_storeGetAll(appGroupName) as FutureOr<Map<String, Object>>);
     assert(fromSystem != null);
     // Strip the flutter. prefix from the returned preferences.
-    final Map<String, Object> preferencesMap = <String, Object>{};
+    final Map<String, Object?> preferencesMap = <String, Object?>{};
     for (String key in fromSystem.keys) {
       assert(key.startsWith(_prefix));
       preferencesMap[key.substring(_prefix.length)] = fromSystem[key];
@@ -161,7 +159,7 @@ class SharedPreferencesAppGroupIos {
     return preferencesMap;
   }
 
-  Future<bool> _setValue(String valueType, String key, Object value) {
+  Future<bool> _setValue(String? valueType, String key, Object? value) {
     final String prefixedKey = '$_prefix$key';
     if (value == null) {
       _preferenceCache.remove(key);
@@ -170,6 +168,8 @@ class SharedPreferencesAppGroupIos {
       if (value is List<String>) {
         // Make a copy of the list so that later mutations won't propagate
         _preferenceCache[key] = value.toList();
+      } else if (value is Map<String, String>) {
+        _preferenceCache[key] = value.map((key, value) => MapEntry(key, value));
       } else {
         _preferenceCache[key] = value;
       }
@@ -184,7 +184,7 @@ class SharedPreferencesAppGroupIos {
     });
   }
 
-  Future<bool> _storeSetValue(String valueType, String key, Object value) {
+  Future<bool> _storeSetValue(String? valueType, String key, Object value) {
     return _invokeBoolMethod('set$valueType', <String, dynamic>{
       'appGroupName': _appGroupName,
       'key': key,
@@ -196,13 +196,13 @@ class SharedPreferencesAppGroupIos {
     return _channel.invokeMethod<bool>(method, params).then<bool>((dynamic result) => result);
   }
 
-  Future<bool> _storeClear() {
+  Future<bool?> _storeClear() {
     return _channel.invokeMethod<bool>('clear', <String, dynamic>{
       'appGroupName': _appGroupName,
     });
   }
 
-  static Future<Map<String, Object>> _storeGetAll(String appGroupName) {
+  static Future<Map<String, Object>?> _storeGetAll(String appGroupName) {
     return _channel.invokeMapMethod<String, Object>('getAll', <String, dynamic>{
       'appGroupName': appGroupName,
     });

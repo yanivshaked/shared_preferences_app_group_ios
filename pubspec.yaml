@@ -1,10 +1,10 @@
 name: shared_preferences_app_group_ios
 description: Support for iOS NSUserDefaults shared between iOS AppGroups.
-version: 0.0.3
+version: 0.0.4
 homepage: https://github.com/yanivshaked/shared_preferences_app_group_ios
 
 environment:
-  sdk: ">=2.7.0 <3.0.0"
+  sdk: '>=2.12.0 <3.0.0'
   flutter: ">=1.10.0"
 
 dependencies:

@@ -1,3 +1,7 @@
+## 0.0.4
+
+* Migrated to Null safety.
+
 ## 0.0.3
 
 * Support for Android platform (over Shared preferences), including map.
