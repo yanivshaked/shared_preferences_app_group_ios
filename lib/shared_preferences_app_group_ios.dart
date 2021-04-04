@@ -6,11 +6,9 @@ class SharedPreferencesAppGroupIos {
   static const MethodChannel _channel = const MethodChannel('shared_preferences_app_group_ios');
 
   static const String _prefix = 'flutter.';
-  static late Map<String, Completer<SharedPreferencesAppGroupIos>> _completersMap;
+  static late Map<String, Completer<SharedPreferencesAppGroupIos>> _completersMap = new Map<String, Completer<SharedPreferencesAppGroupIos>>();
 
-  SharedPreferencesAppGroupIos._(this._preferenceCache, this._appGroupName){
-      _completersMap = new Map<String, Completer<SharedPreferencesAppGroupIos>>();
-  }
+  SharedPreferencesAppGroupIos._(this._preferenceCache, this._appGroupName);
 
   /// The cache that holds all preferences.
   ///
@@ -52,13 +50,13 @@ class SharedPreferencesAppGroupIos {
   /// Reads a set of string values from persistent storage, throwing an
   /// exception if it's not a string set.
   List<String>? getStringList(String key) {
-    List<Object>? list = _preferenceCache[key] as List<Object>?;
-    if (list != null && list is! List<String>) {
+    var list = _preferenceCache[key] as List<dynamic>;
+    if (list is! List<String>) {
       list = list.cast<String>().toList();
       _preferenceCache[key] = list;
     }
     // Make a copy of the list so that later mutations won't propagate
-    return list?.toList() as List<String>?;
+    return list.toList();
   }
 
   /// Reads a map of string to string values from persistent storage, throwing an
@@ -148,11 +146,11 @@ class SharedPreferencesAppGroupIos {
   }
 
   static Future<Map<String, Object?>> _getSharedPreferencesMap(String appGroupName) async {
-    final Map<String, Object> fromSystem = await (_storeGetAll(appGroupName) as FutureOr<Map<String, Object>>);
+    final fromSystem = await _storeGetAll(appGroupName);
     assert(fromSystem != null);
     // Strip the flutter. prefix from the returned preferences.
     final Map<String, Object?> preferencesMap = <String, Object?>{};
-    for (String key in fromSystem.keys) {
+    for (String key in fromSystem!.keys) {
       assert(key.startsWith(_prefix));
       preferencesMap[key.substring(_prefix.length)] = fromSystem[key];
     }

@@ -1,3 +1,7 @@
+## 0.0.5
+
+* Migrated to Null safety (Fixed).
+
 ## 0.0.4
 
 * Migrated to Null safety.
